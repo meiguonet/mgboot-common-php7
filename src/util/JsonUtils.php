@@ -14,7 +14,11 @@ final class JsonUtils
     {
     }
 
-    public static function mapFrom(mixed $arg0): array|stdClass
+    /**
+     * @param mixed $arg0
+     * @return array|stdClass
+     */
+    public static function mapFrom($arg0)
     {
         if (!is_string($arg0) || empty($arg0)) {
             return new stdClass();
@@ -24,7 +28,11 @@ final class JsonUtils
         return ArrayUtils::isAssocArray($data) ? $data : new stdClass();
     }
 
-    public static function arrayFrom(mixed $arg0): array
+    /**
+     * @param mixed $arg0
+     * @return array
+     */
+    public static function arrayFrom($arg0): array
     {
         if (!is_string($arg0) || empty($arg0)) {
             return [];
@@ -34,12 +42,21 @@ final class JsonUtils
         return ArrayUtils::isList($data) ? $data : [];
     }
 
-    public static function toJson(mixed $arg0): string {
+    /**
+     * @param mixed $arg0
+     * @return string
+     */
+    public static function toJson($arg0): string
+    {
         $json = json_encode($arg0, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
         return is_string($json) ? $json : '';
     }
 
-    public static function toJsonObjectString(mixed $arg0): string
+    /**
+     * @param mixed $arg0
+     * @return string
+     */
+    public static function toJsonObjectString($arg0): string
     {
         $json = json_encode($arg0, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
 
@@ -50,7 +67,11 @@ final class JsonUtils
         return $json;
     }
 
-    public static function toJsonArrayString(mixed $arg0): string
+    /**
+     * @param mixed $arg0
+     * @return string
+     */
+    public static function toJsonArrayString($arg0): string
     {
         $json = json_encode($arg0, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
 

@@ -7,10 +7,25 @@ use mgboot\util\ArrayUtils;
 
 final class Pager
 {
-    private int $recordTotal;
-    private int $currentPage;
-    private int $pageSize;
-    private int $pageStep;
+    /**
+     * @var int
+     */
+    private $recordTotal;
+
+    /**
+     * @var int
+     */
+    private $currentPage;
+
+    /**
+     * @var int
+     */
+    private $pageSize;
+
+    /**
+     * @var int
+     */
+    private $pageStep;
 
     private function __construct(int... $args)
     {
@@ -41,16 +56,20 @@ final class Pager
         $this->pageStep = $pageStep < 1 ? 5 : $pageStep;
     }
 
-    private function __clone(): void
+    private function __clone()
     {
     }
 
-    public static function create(int... $args): self
+    public static function create(int... $args): Pager
     {
         return new self(...$args);
     }
 
-    public function toMap(array|string|null $includeFields = null): array
+    /**
+     * @param string[]|string|null $includeFields
+     * @return array
+     */
+    public function toMap($includeFields = null): array
     {
         if (is_string($includeFields) && !empty($includeFields)) {
             $includeFields = preg_split(Regexp::COMMA_SEP, $includeFields);
@@ -100,7 +119,7 @@ final class Pager
         return $this->toMap('recordTotal, pageTotal, currentPage, pageSize');
     }
 
-    public function setRecordTotal(?int $recordTotal): self
+    public function setRecordTotal(?int $recordTotal): Pager
     {
         if (is_int($recordTotal) && $recordTotal > 0) {
             $this->recordTotal = $recordTotal;
@@ -109,7 +128,7 @@ final class Pager
         return $this;
     }
 
-    public function setCurrentPage(?int $currentPage): self
+    public function setCurrentPage(?int $currentPage): Pager
     {
         if (is_int($currentPage) && $currentPage > 0) {
             $this->currentPage = $currentPage;
@@ -118,7 +137,7 @@ final class Pager
         return $this;
     }
 
-    public function setPageSize(?int $pageSize): self
+    public function setPageSize(?int $pageSize): Pager
     {
         if (is_int($pageSize) && $pageSize > 0) {
             $this->pageSize = $pageSize;
@@ -127,7 +146,7 @@ final class Pager
         return $this;
     }
 
-    public function setPageStep(?int $pageStep): self
+    public function setPageStep(?int $pageStep): Pager
     {
         if (is_int($pageStep) && $pageStep > 0) {
             $this->pageStep = $pageStep;

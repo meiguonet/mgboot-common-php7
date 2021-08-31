@@ -8,7 +8,7 @@ final class TokenizeUtils
     {
     }
 
-    private function __clone(): void
+    private function __clone()
     {
     }
 
@@ -30,42 +30,54 @@ final class TokenizeUtils
 
     public static function getNamespace(array $tokens): string
     {
-        $n1 = -1;
+        $n = -1;
+        $idx = -1;
+        $sb = [];
 
-        foreach ($tokens as $token) {
-            if (!self::isToken($token)) {
+        foreach ($tokens as $i => $token) {
+            if (!is_array($token)) {
                 continue;
             }
 
             if ($token[0] === T_NAMESPACE) {
-                $n1 = $token[2];
+                $n = $token[2];
+                $idx = $i;
                 break;
             }
         }
 
-        if ($n1 < 0) {
+        if ($n < 0) {
             return '';
         }
 
-        foreach ($tokens as $token) {
-            if (!self::isToken($token)) {
+        $cnt = count($tokens);
+
+        for ($i = $idx + 1; $i < $cnt; $i++) {
+            $token = $tokens[$i];
+
+            if (!is_array($token)) {
                 continue;
             }
 
-            if ($token[0] === T_NAME_QUALIFIED && $token[2] === $n1) {
-                return $token[1];
+            if ($token[2] > $n) {
+                break;
+            }
+
+            if ($token[0] === T_STRING || $token[0] === T_NS_SEPARATOR) {
+                $sb[] = $token[1];
             }
         }
 
-        return '';
+        return empty($sb) ? '' : implode('', $sb);
     }
 
     public static function getUsedClasses(array $tokens): array
     {
-        $nums = [];
+        $lineNumbers = [];
+        $classes = [];
 
         foreach ($tokens as $token) {
-            if (!self::isToken($token)) {
+            if (!is_array($token)) {
                 continue;
             }
 
@@ -73,25 +85,29 @@ final class TokenizeUtils
                 continue;
             }
 
-            $nums[] = $token[2];
+            $lineNumbers[] = (int) $token[2];
         }
 
-        if (empty($nums)) {
-            return [];
-        }
+        foreach ($lineNumbers as $lineNumber) {
+            $sb = [];
 
-        $classes = [];
+            foreach ($tokens as $token) {
+                if (!is_array($token) || $token[2] !== $lineNumber) {
+                    continue;
+                }
 
-        foreach ($tokens as $token) {
-            if (!self::isToken($token)) {
+                if (!in_array($token[0], [T_STRING, T_NS_SEPARATOR])) {
+                    continue;
+                }
+
+                $sb[] = $token[1];
+            }
+
+            if (empty($sb)) {
                 continue;
             }
 
-            if ($token[0] !== T_NAME_QUALIFIED || !in_array($token[2], $nums)) {
-                continue;
-            }
-
-            $classes[] = $token[1];
+            $classes[] = StringUtils::ensureLeft(implode('', $sb), "\\");
         }
 
         return $classes;
@@ -99,38 +115,41 @@ final class TokenizeUtils
 
     private static function getSimpleClassName(array $tokens): string
     {
-        $n1 = -1;
+        $n = -1;
+        $idx = -1;
 
-        foreach ($tokens as $token) {
-            if (!self::isToken($token)) {
+        foreach ($tokens as $i => $token) {
+            if (!is_array($token)) {
                 continue;
             }
 
             if ($token[0] === T_CLASS) {
-                $n1 = $token[2];
+                $n = $token[2];
+                $idx = $i;
                 break;
             }
         }
 
-        if ($n1 < 0) {
+        if ($n < 0) {
             return '';
         }
 
-        foreach ($tokens as $token) {
-            if (!self::isToken($token)) {
+        $cnt = count($tokens);
+        $className = '';
+
+        for ($i = $idx + 1; $i < $cnt; $i++) {
+            $token = $tokens[$i];
+
+            if (!is_array($token)) {
                 continue;
             }
 
-            if ($token[0] === T_STRING && $token[2] === $n1) {
-                return $token[1];
+            if ($token[2] === $n && $token[0] === T_STRING) {
+                $className = $token[1];
+                break;
             }
         }
 
-        return '';
-    }
-
-    private static function isToken(mixed $arg0): bool
-    {
-        return is_array($arg0) && count($arg0) >= 3 && is_int($arg0[0]) && is_string($arg0[1]) && is_int($arg0[2]);
+        return $className;
     }
 }

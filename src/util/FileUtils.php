@@ -10,7 +10,7 @@ final class FileUtils
     {
     }
 
-    private function __clone(): void
+    private function __clone()
     {
     }
 
@@ -74,7 +74,7 @@ final class FileUtils
         $mimeType = finfo_file($finfo, $filepath);
         finfo_close($finfo);
 
-        if ($mimeType === false || empty($mimeType)) {
+        if (empty($mimeType)) {
             return '';
         }
 

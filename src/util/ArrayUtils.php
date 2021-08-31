@@ -17,7 +17,7 @@ final class ArrayUtils
     {
     }
 
-    public static function first(array $arr, callable $callback): mixed
+    public static function first(array $arr, callable $callback)
     {
         if (empty($arr) || !self::isList($arr)) {
             return null;
@@ -64,7 +64,12 @@ final class ArrayUtils
         return $arr;
     }
 
-    public static function removeKeys(array $arr, string|array $keys): array
+    /**
+     * @param array $arr
+     * @param string[]|string $keys
+     * @return array
+     */
+    public static function removeKeys(array $arr, $keys): array
     {
         if (is_string($keys) && $keys !== '') {
             $keys = preg_split('/[\x20\t]*,[\x20\t]*/', $keys);
@@ -105,7 +110,11 @@ final class ArrayUtils
                 continue;
             }
 
-            if (is_string($value) && $value === '') {
+            if (!is_string($value)) {
+                continue;
+            }
+
+            if ($value === '') {
                 unset($arr[$key]);
             }
         }
@@ -113,7 +122,11 @@ final class ArrayUtils
         return $arr;
     }
 
-    public static function isAssocArray(mixed $arg0): bool
+    /**
+     * @param mixed $arg0
+     * @return bool
+     */
+    public static function isAssocArray($arg0): bool
     {
         if (!is_array($arg0) || empty($arg0)) {
             return false;
@@ -130,7 +143,11 @@ final class ArrayUtils
         return true;
     }
 
-    public static function isList(mixed $arg0): bool
+    /**
+     * @param mixed $arg0
+     * @return bool
+     */
+    public static function isList($arg0): bool
     {
         if (!is_array($arg0) || empty($arg0)) {
             return false;
@@ -152,7 +169,11 @@ final class ArrayUtils
         return true;
     }
 
-    public static function isIntArray(mixed $arg0): bool
+    /**
+     * @param mixed $arg0
+     * @return bool
+     */
+    public static function isIntArray($arg0): bool
     {
         if (!self::isList($arg0)) {
             return false;
@@ -167,7 +188,11 @@ final class ArrayUtils
         return true;
     }
 
-    public static function isStringArray(mixed $arg0): bool
+    /**
+     * @param mixed $arg0
+     * @return bool
+     */
+    public static function isStringArray($arg0): bool
     {
         if (!self::isList($arg0)) {
             return false;
@@ -202,7 +227,12 @@ final class ArrayUtils
         return implode('', $sb);
     }
 
-    public static function requestParams(array $arr, array|string $rules): array
+    /**
+     * @param array $arr
+     * @param string[]|string $rules
+     * @return array
+     */
+    public static function requestParams(array $arr, $rules): array
     {
         if (is_string($rules) && $rules !== '') {
             $rules = preg_split('/[\x20\t]*,[\x20\t]*/', $rules);
@@ -300,7 +330,12 @@ final class ArrayUtils
         return $map1;
     }
 
-    public static function copyFields(mixed $arr, array|string $keys): array
+    /**
+     * @param array $arr
+     * @param string[]|string $keys
+     * @return array
+     */
+    public static function copyFields(array $arr, $keys): array
     {
         if (is_string($keys) && $keys !== '') {
             $keys = preg_split(Regexp::COMMA_SEP, $keys);
@@ -323,9 +358,15 @@ final class ArrayUtils
         return $map1;
     }
 
-    public static function fromBean(mixed $obj, array $propertyNameToMapKey = [], bool $ignoreNull = false): array
+    /**
+     * @param object $obj
+     * @param array $propertyNameToMapKey
+     * @param bool $ignoreNull
+     * @return array
+     */
+    public static function fromBean(object $obj, array $propertyNameToMapKey = [], bool $ignoreNull = false): array
     {
-        if (is_object($obj) && method_exists($obj, 'toMap')) {
+        if (method_exists($obj, 'toMap')) {
             return $obj->toMap($propertyNameToMapKey, $ignoreNull);
         }
 
@@ -356,10 +397,13 @@ final class ArrayUtils
             return $value;
         }
 
-        return match ($securityMode) {
-            SecurityMode::HTML_PURIFY => HtmlPurifier::purify($value),
-            SecurityMode::STRIP_TAGS => strip_tags($value),
-            default => $value
-        };
+        switch ($securityMode) {
+            case SecurityMode::HTML_PURIFY:
+                return HtmlPurifier::purify($value);
+            case SecurityMode::STRIP_TAGS:
+                return strip_tags($value);
+            default:
+                return $value;
+        }
     }
 }

@@ -13,7 +13,7 @@ final class TimeUnit
     {
     }
 
-    private function __clone(): void
+    private function __clone()
     {
     }
 }

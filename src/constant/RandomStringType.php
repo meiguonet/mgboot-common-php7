@@ -12,7 +12,7 @@ final class RandomStringType
     {
     }
 
-    private function __clone(): void
+    private function __clone()
     {
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace mgboot\trait;
+namespace mgboot\traits;
 
 use mgboot\util\ExceptionUtils;
 use Psr\Log\LoggerInterface;
@@ -8,8 +8,15 @@ use Throwable;
 
 trait LogAbleTrait
 {
-    private ?LoggerInterface $logger = null;
-    private bool $enableLogging = true;
+    /**
+     * @var LoggerInterface|null
+     */
+    private $logger = null;
+
+    /**
+     * @var bool
+     */
+    private $enableLogging = true;
 
     public function writeDebugLog(string $log, ?array $context = null, bool $force = false): void
     {
@@ -21,17 +28,23 @@ trait LogAbleTrait
         $this->writeLog('info', $log, $context, $force);
     }
 
-    public function writeErrorLog(string|Throwable $arg0, ?array $context = null, bool $force = false): void
+    /**
+     * @param string|Throwable $arg0
+     * @param array|null $context
+     * @param bool $force
+     */
+    public function writeErrorLog($arg0, ?array $context = null, bool $force = false): void
     {
         $this->writeLog('error', $arg0, $context, $force);
     }
 
-    public function writeLog(
-        string $logLevel,
-        string|Throwable $arg1,
-        ?array $context = null,
-        bool $force = false
-    ): void
+    /**
+     * @param string $logLevel
+     * @param string|Throwable $arg1
+     * @param array|null $context
+     * @param bool $force
+     */
+    public function writeLog(string $logLevel, $arg1, ?array $context = null, bool $force = false): void
     {
         $logger = $this->logger;
 

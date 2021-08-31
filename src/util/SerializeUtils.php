@@ -14,12 +14,16 @@ final class SerializeUtils
     {
     }
 
-    public static function serialize(mixed $arg0): string
+    /**
+     * @param mixed $arg0
+     * @return string
+     */
+    public static function serialize($arg0): string
     {
         if (extension_loaded('igbinary')) {
             try {
                 $contents = igbinary_serialize($arg0);
-            } catch (Throwable) {
+            } catch (Throwable $ex) {
                 $contents = '';
             }
 
@@ -28,16 +32,20 @@ final class SerializeUtils
 
         try {
             $contents = serialize($arg0);
-        } catch (Throwable) {
+        } catch (Throwable $ex) {
             $contents = '';
         }
 
         return "php:$contents";
     }
 
-    public static function unserialize(string $contents): mixed
+    /**
+     * @param string $contents
+     * @return mixed
+     */
+    public static function unserialize(string $contents)
     {
-        if (str_starts_with($contents, 'igb:')) {
+        if (preg_match('/^igb:/', $contents)) {
             if (!extension_loaded('igbinary')) {
                 return null;
             }
@@ -46,7 +54,7 @@ final class SerializeUtils
 
             try {
                 return igbinary_unserialize($contents);
-            } catch (Throwable) {
+            } catch (Throwable $ex) {
                 return null;
             }
         }
@@ -55,7 +63,7 @@ final class SerializeUtils
 
         try {
             return unserialize($contents);
-        } catch (Throwable) {
+        } catch (Throwable $ex) {
             return null;
         }
     }

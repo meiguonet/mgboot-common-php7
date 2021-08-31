@@ -10,10 +10,25 @@ use Throwable;
 
 final class AppConf
 {
-    private static string $env = 'dev';
-    private static bool $cacheEnabled = false;
-    private static string $cacheDir = '';
-    private static array $data = [];
+    /**
+     * @var string
+     */
+    private static $env = 'dev';
+
+    /**
+     * @var bool
+     */
+    private static $cacheEnabled = false;
+
+    /**
+     * @var string
+     */
+    private static $cacheDir = '';
+
+    /**
+     * @var array
+     */
+    private static $data = [];
 
     public static function setEnv(string $env): void
     {
@@ -55,7 +70,11 @@ final class AppConf
         unlink($cacheFile);
     }
 
-    public static function get(string $key): mixed
+    /**
+     * @param string $key
+     * @return mixed
+     */
+    public static function get(string $key)
     {
         if (!str_contains($key, '.')) {
             return self::getValueInternal($key);
@@ -166,7 +185,7 @@ final class AppConf
 
         try {
             $data = Yaml::parseFile($filepath);
-        } catch (Throwable) {
+        } catch (Throwable $ex) {
             $data = [];
         }
 
@@ -184,7 +203,7 @@ final class AppConf
 
         try {
             $data = Yaml::parseFile($filepath);
-        } catch (Throwable) {
+        } catch (Throwable $ex) {
             $data = [];
         }
 
@@ -201,7 +220,7 @@ final class AppConf
 
         try {
             $map1 = Yaml::parseFile($filepath);
-        } catch (Throwable) {
+        } catch (Throwable $ex) {
             $map1 = [];
         }
 
@@ -245,7 +264,7 @@ final class AppConf
         if (is_file($cacheFile)) {
             try {
                 $data = include($cacheFile);
-            } catch (Throwable) {
+            } catch (Throwable $ex) {
                 $data = null;
             }
 
@@ -291,7 +310,7 @@ final class AppConf
         fclose($fp);
     }
 
-    private static function getValueInternal(string $mapKey, array|null $data = null): mixed
+    private static function getValueInternal(string $mapKey, ?array $data = null)
     {
         if (empty($data)) {
             $data = self::$data;

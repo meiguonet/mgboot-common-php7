@@ -8,18 +8,21 @@ use mgboot\util\StringUtils;
 
 final class DotAccessData
 {
-    private array $data;
+    /**
+     * @var array
+     */
+    private $data;
 
     private function __construct(array $data)
     {
         $this->data = $data;
     }
 
-    private function __clone(): void
+    private function __clone()
     {
     }
 
-    public static function fromJson(string $json): self
+    public static function fromJson(string $json): DotAccessData
     {
         $data = json_decode($json, true);
 
@@ -30,7 +33,7 @@ final class DotAccessData
         return new self($data);
     }
 
-    public static function fromArray(array $data): self
+    public static function fromArray(array $data): DotAccessData
     {
         if (!ArrayUtils::isAssocArray($data)) {
             $data = [];
@@ -39,7 +42,11 @@ final class DotAccessData
         return new self($data);
     }
 
-    public function get(string $key): mixed
+    /**
+     * @param string $key
+     * @return mixed
+     */
+    public function get(string $key)
     {
         if (!str_contains($key, '.')) {
             return $this->getValueInternal($key);
@@ -124,7 +131,7 @@ final class DotAccessData
         return Cast::toMapList($this->get($key));
     }
 
-    private function getValueInternal(string $mapKey, array|null $data = null): mixed
+    private function getValueInternal(string $mapKey, ?array $data = null)
     {
         if (empty($data)) {
             $data = $this->data;

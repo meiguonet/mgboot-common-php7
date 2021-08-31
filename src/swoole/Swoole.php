@@ -1,16 +1,28 @@
-<?php
+<?php /** @noinspection PhpUndefinedConstantInspection */
+/** @noinspection PhpUndefinedClassInspection */
+/** @noinspection PhpUndefinedFunctionInspection */
+/** @noinspection PhpUndefinedNamespaceInspection */
+
+/** @noinspection PhpFullyQualifiedNameUsageInspection */
 
 namespace mgboot\swoole;
 
 use Closure;
 use mgboot\Cast;
+use mgboot\util\StringUtils;
 use Throwable;
 
 final class Swoole
 {
-    private static mixed $server = null;
+    /**
+     * @var mixed
+     */
+    private static $server = null;
 
-    private static array $tcpClientSettings = [
+    /**
+     * @var array
+     */
+    private static $tcpClientSettings = [
         'connect_timeout' => 2.0,
         'write_timeout' => 5.0,
         'read_timeout' => 300.0,
@@ -27,32 +39,46 @@ final class Swoole
     {
     }
 
-    public static function setServer(mixed $server): void
+    /**
+     * @param mixed $server
+     */
+    public static function setServer($server): void
     {
         self::$server = $server;
     }
 
-    public static function getServer(): mixed
+    /**
+     * @return mixed
+     */
+    public static function getServer()
     {
         return self::$server;
     }
 
-    public static function isSwooleHttpRequest(mixed $arg0): bool
+    /**
+     * @param mixed $arg0
+     * @return bool
+     */
+    public static function isSwooleHttpRequest($arg0): bool
     {
         if (!is_object($arg0)) {
             return false;
         }
 
-        return str_ends_with(get_class($arg0), "Swoole\\Http\\Request");
+        return StringUtils::endsWith(get_class($arg0), "Swoole\\Http\\Request");
     }
 
-    public static function isSwooleHttpResponse(mixed $arg0): bool
+    /**
+     * @param mixed $arg0
+     * @return bool
+     */
+    public static function isSwooleHttpResponse($arg0): bool
     {
         if (!is_object($arg0)) {
             return false;
         }
 
-        return str_ends_with(get_class($arg0), "Swoole\\Http\\Response");
+        return StringUtils::endsWith(get_class($arg0), "Swoole\\Http\\Response");
     }
 
     public static function getWorkerId(): int
@@ -84,13 +110,12 @@ final class Swoole
         return Cast::toBoolean($server->taskworker);
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
     public static function getCoroutineId(): int
     {
         try {
             $cid = \Swoole\Coroutine::getCid();
             return is_int($cid) && $cid >= 0 ? $cid : -1;
-        } catch (Throwable) {
+        } catch (Throwable $ex) {
             return -1;
         }
     }
@@ -104,7 +129,6 @@ final class Swoole
         return !$notTaskWorker || !self::inTaskWorker();
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
     public static function newTcpClient(string $host, int $port, ?array $settings = null): \Swoole\Coroutine\Client
     {
         if (empty($settings)) {
@@ -119,16 +143,23 @@ final class Swoole
         return $client;
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
-    public static function tcpClientSend(mixed $client, string $contents): void
+    /**
+     * @param mixed $client
+     * @param string $contents
+     */
+    public static function tcpClientSend($client, string $contents): void
     {
         if ($client instanceof \Swoole\Coroutine\Client) {
             $client->send($contents);
         }
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
-    public static function tcpClientRecv(mixed $client, ?float $timeout = null): mixed
+    /**
+     * @param mixed $client
+     * @param float|null $timeout
+     * @return mixed
+     */
+    public static function tcpClientRecv($client, ?float $timeout = null)
     {
         if ($client instanceof \Swoole\Coroutine\Client) {
             return $client->recv($timeout);
@@ -137,8 +168,11 @@ final class Swoole
         return null;
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
-    public static function tcpClientIsConnected(mixed $client): bool
+    /**
+     * @param mixed $client
+     * @return bool
+     */
+    public static function tcpClientIsConnected($client): bool
     {
         if ($client instanceof \Swoole\Coroutine\Client) {
             $client->isConnected();
@@ -147,28 +181,38 @@ final class Swoole
         return false;
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
-    public static function tcpClientClose(mixed $client): void
+    /**
+     * @param mixed $client
+     */
+    public static function tcpClientClose($client): void
     {
         if ($client instanceof \Swoole\Coroutine\Client) {
             $client->close();
         }
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
+    /**
+     * @return \Swoole\Coroutine\WaitGroup
+     */
     public static function newWaitGroup(): \Swoole\Coroutine\WaitGroup
     {
         return new \Swoole\Coroutine\WaitGroup();
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
+    /**
+     * @param int|null $value
+     * @return \Swoole\Atomic
+     */
     public static function newAtomic(?int $value = null): \Swoole\Atomic
     {
         return is_int($value) && $value > 0 ? new \Swoole\Atomic($value) : new \Swoole\Atomic();
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
-    public static function atomicGet(mixed $atomic): mixed
+    /**
+     * @param mixed $atomic
+     * @return mixed
+     */
+    public static function atomicGet($atomic)
     {
         if ($atomic instanceof \Swoole\Atomic) {
             return $atomic->get();
@@ -177,8 +221,12 @@ final class Swoole
         return null;
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
-    public static function atomicSet(mixed $atomic, int $value): mixed
+    /**
+     * @param mixed $atomic
+     * @param int $value
+     * @return mixed
+     */
+    public static function atomicSet($atomic, int $value)
     {
         if ($atomic instanceof \Swoole\Atomic) {
             return $atomic->set($value);
@@ -187,8 +235,12 @@ final class Swoole
         return null;
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
-    public static function atomicAdd(mixed $atomic, int $value): mixed
+    /**
+     * @param mixed $atomic
+     * @param int $value
+     * @return mixed
+     */
+    public static function atomicAdd($atomic, int $value)
     {
         if ($atomic instanceof \Swoole\Atomic) {
             return $atomic->add($value);
@@ -197,8 +249,12 @@ final class Swoole
         return null;
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
-    public static function atomicSub(mixed $atomic, int $value): mixed
+    /**
+     * @param mixed $atomic
+     * @param int $value
+     * @return mixed
+     */
+    public static function atomicSub($atomic, int $value)
     {
         if ($atomic instanceof \Swoole\Atomic) {
             return $atomic->sub($value);
@@ -207,8 +263,13 @@ final class Swoole
         return null;
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
-    public static function atomicCompareAndSet(mixed $atomic, int $cmpValue, int $setValue): bool
+    /**
+     * @param mixed $atomic
+     * @param int $cmpValue
+     * @param int $setValue
+     * @return bool
+     */
+    public static function atomicCompareAndSet($atomic, int $cmpValue, int $setValue): bool
     {
         if ($atomic instanceof \Swoole\Atomic) {
             return $atomic->cmpset($cmpValue, $setValue);
@@ -217,26 +278,35 @@ final class Swoole
         return false;
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
+    /**
+     * @param Closure $fn
+     */
     public static function defer(Closure $fn): void
     {
         \Swoole\Coroutine::defer($fn);
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
-    public static function runInCoroutine(callable $call, mixed ...$args): void
+    /**
+     * @param callable $call
+     * @param mixed ...$args
+     */
+    public static function runInCoroutine(callable $call, ...$args): void
     {
         \Swoole\Coroutine\run($call, ...$args);
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
-    public static function timerTick(int $ms, callable $call, mixed ...$args): int
+    /**
+     * @param int $ms
+     * @param callable $call
+     * @param mixed ...$args
+     * @return int
+     */
+    public static function timerTick(int $ms, callable $call, ...$args): int
     {
         $id = \Swoole\Timer::tick($ms, $call, ...$args);
         return Cast::toInt($id);
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
     public static function timerClear(int $timerId): void
     {
         if ($timerId < 0) {
@@ -246,14 +316,16 @@ final class Swoole
         \Swoole\Timer::clear($timerId);
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
     public static function newChannel(?int $size = null): \Swoole\Coroutine\Channel
     {
         return new \Swoole\Coroutine\Channel($size);
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
-    public static function chanIsEmpty(mixed $ch): bool
+    /**
+     * @param mixed $ch
+     * @return bool
+     */
+    public static function chanIsEmpty($ch): bool
     {
         if ($ch instanceof \Swoole\Coroutine\Channel) {
             return $ch->isEmpty();
@@ -262,16 +334,24 @@ final class Swoole
         return true;
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
-    public static function chanPush(mixed $ch, mixed $data, ?float $timeout = null): void
+    /**
+     * @param mixed $ch
+     * @param mixed $data
+     * @param float|null $timeout
+     */
+    public static function chanPush($ch, $data, ?float $timeout = null): void
     {
         if ($ch instanceof \Swoole\Coroutine\Channel) {
             $ch->push($data, $timeout);
         }
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
-    public static function chanPop(mixed $ch, ?float $timeout = null): mixed
+    /**
+     * @param mixed $ch
+     * @param float|null $timeout
+     * @return mixed
+     */
+    public static function chanPop($ch, ?float $timeout = null)
     {
         if ($ch instanceof \Swoole\Coroutine\Channel) {
             return $ch->pop($timeout);
@@ -280,7 +360,6 @@ final class Swoole
         return null;
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
     public static function sleep(float $seconds): void
     {
         \Swoole\Coroutine::sleep($seconds);

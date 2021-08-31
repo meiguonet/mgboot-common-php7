@@ -14,7 +14,11 @@ final class CollectionUtils
     {
     }
 
-    public static function toCollection(mixed $arg0): Collection
+    /**
+     * @param mixed $arg0
+     * @return Collection
+     */
+    public static function toCollection($arg0): Collection
     {
         if (is_array($arg0)) {
             return collect($arg0);
@@ -29,11 +33,20 @@ final class CollectionUtils
 
     public static function object2array(Collection $list): Collection
     {
-        return $list->map(fn($it) => is_array($it) ? $it : get_object_vars($it));
+        return $list->map(function ($item) {
+            return is_array($item) ? $item : get_object_vars($item);
+        });
     }
 
-    public static function removeKeys(Collection $list, array|string $keys): Collection
+    /**
+     * @param Collection $list
+     * @param string[]|string $keys
+     * @return Collection
+     */
+    public static function removeKeys(Collection $list, $keys): Collection
     {
-        return $list->map(fn($it) => ArrayUtils::removeKeys($it, $keys));
+        return $list->map(function ($item) use ($keys) {
+            return ArrayUtils::removeKeys($item, $keys);
+        });
     }
 }

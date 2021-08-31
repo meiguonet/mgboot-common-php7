@@ -15,7 +15,12 @@ final class Cast
     {
     }
 
-    public static function toInt(mixed $arg0, int $default = PHP_INT_MIN): int
+    /**
+     * @param mixed $arg0
+     * @param int $default
+     * @return int
+     */
+    public static function toInt($arg0, int $default = PHP_INT_MIN): int
     {
         if (is_int($arg0)) {
             return $arg0;
@@ -32,24 +37,34 @@ final class Cast
         return $default;
     }
 
-    public static function toFloat(mixed $arg0, float $default = PHP_FLOAT_MIN): float
+    /**
+     * @param mixed $arg0
+     * @param float $default
+     * @return float
+     */
+    public static function toFloat($arg0, float $default = PHP_FLOAT_MIN): float
     {
         if (is_float($arg0)) {
             return $arg0;
         }
 
         if (is_int($arg0)) {
-            return (float)$arg0;
+            return (float) $arg0;
         }
 
         if (is_string($arg0) && StringUtils::isFloat($arg0)) {
-            return (float)$arg0;
+            return (float) $arg0;
         }
 
         return $default;
     }
 
-    public static function toString(mixed $arg0, string $default = ''): string
+    /**
+     * @param mixed $arg0
+     * @param string $default
+     * @return string
+     */
+    public static function toString($arg0, string $default = ''): string
     {
         if (is_string($arg0)) {
             return $arg0;
@@ -71,7 +86,12 @@ final class Cast
         return $default;
     }
 
-    public static function toBoolean(mixed $arg0, bool $default = false): bool
+    /**
+     * @param mixed $arg0
+     * @param bool $default
+     * @return bool
+     */
+    public static function toBoolean($arg0, bool $default = false): bool
     {
         if (is_bool($arg0)) {
             return $arg0;
@@ -96,7 +116,11 @@ final class Cast
         return $default;
     }
 
-    public static function toAssocArray(mixed $arg0): array
+    /**
+     * @param mixed $arg0
+     * @return array
+     */
+    public static function toAssocArray($arg0): array
     {
         if (!is_array($arg0)) {
             return [];
@@ -115,7 +139,11 @@ final class Cast
         return $ret;
     }
 
-    public static function toIntArray(mixed $arg0): array
+    /**
+     * @param mixed $arg0
+     * @return array
+     */
+    public static function toIntArray($arg0): array
     {
         if (!is_array($arg0)) {
             return [];
@@ -136,7 +164,11 @@ final class Cast
         return $ret;
     }
 
-    public static function toStringArray(mixed $arg0): array
+    /**
+     * @param mixed $arg0
+     * @return array
+     */
+    public static function toStringArray($arg0): array
     {
         if (empty($arg0) || !ArrayUtils::isList($arg0)) {
             return [];
@@ -158,7 +190,11 @@ final class Cast
         return $ret;
     }
 
-    public static function toMapList(mixed $arg0): array
+    /**
+     * @param mixed $arg0
+     * @return array
+     */
+    public static function toMapList($arg0): array
     {
         if (empty($arg0) || !ArrayUtils::isList($arg0)) {
             return [];
@@ -189,12 +225,20 @@ final class Cast
         return $ret;
     }
 
-    public static function toDuration(mixed $arg0): int
+    /**
+     * @param mixed $arg0
+     * @return int
+     */
+    public static function toDuration($arg0): int
     {
         return StringUtils::toDuration(self::toString($arg0));
     }
 
-    public static function toDataSize(mixed $arg0): int
+    /**
+     * @param mixed $arg0
+     * @return int
+     */
+    public static function toDataSize($arg0): int
     {
         return StringUtils::toDataSize(self::toString($arg0));
     }

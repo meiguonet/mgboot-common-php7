@@ -1,4 +1,7 @@
-<?php
+<?php /** @noinspection PhpUndefinedClassInspection */
+/** @noinspection PhpUndefinedNamespaceInspection */
+
+/** @noinspection PhpFullyQualifiedNameUsageInspection */
 
 namespace mgboot\swoole;
 
@@ -19,7 +22,6 @@ final class SwooleTable
     {
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
     public static function buildTable(array $columns, int $size = 1024): \Swoole\Table
     {
         $table = new \Swoole\Table($size);
@@ -39,14 +41,13 @@ final class SwooleTable
         return $table;
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
     public static function getTable(string $name): \Swoole\Table
     {
         $ex1 = new RuntimeException("fail to get swoole table: $name");
 
         try {
             $table = Swoole::getServer()->$name;
-        } catch (Throwable) {
+        } catch (Throwable $ex) {
             $table = null;
         }
 
@@ -57,14 +58,12 @@ final class SwooleTable
         return $table;
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
     public static function exists(string $tableName, string $key): bool
     {
         $table = self::getTable($tableName);
         return $table instanceof \Swoole\Table ? $table->exist($key) : false;
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
     public static function remove(string $tableName, string $key): void
     {
         $table = self::getTable($tableName);
@@ -76,7 +75,6 @@ final class SwooleTable
         $table->del($key);
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
     public static function setValue(string $tableName, string $key, array $value): void
     {
         $table = self::getTable($tableName);
@@ -88,7 +86,6 @@ final class SwooleTable
         $table->set($key, $value);
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
     public static function getValue(string $tableName, string $key): ?array
     {
         $table = self::getTable($tableName);
@@ -101,13 +98,15 @@ final class SwooleTable
         return is_array($value) ? $value : null;
     }
 
-    /** @noinspection PhpFullyQualifiedNameUsageInspection */
     private static function parseColumnType(int $type): int
     {
-        return match ($type) {
-            self::COLUMN_TYPE_INT => \Swoole\Table::TYPE_INT,
-            self::COLUMN_TYPE_FLOAT => \Swoole\Table::TYPE_FLOAT,
-            default => \Swoole\Table::TYPE_STRING
-        };
+        switch ($type) {
+            case self::COLUMN_TYPE_INT:
+                return \Swoole\Table::TYPE_INT;
+            case self::COLUMN_TYPE_FLOAT:
+                return \Swoole\Table::TYPE_FLOAT;
+            default:
+                return \Swoole\Table::TYPE_STRING;
+        }
     }
 }

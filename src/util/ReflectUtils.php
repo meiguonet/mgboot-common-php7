@@ -2,12 +2,10 @@
 
 namespace mgboot\util;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use mgboot\Cast;
-use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionMethod;
-use ReflectionNamedType;
-use ReflectionParameter;
 use ReflectionProperty;
 use Throwable;
 
@@ -17,27 +15,25 @@ final class ReflectUtils
     {
     }
 
-    private function __clone(): void
+    private function __clone()
     {
     }
 
     public static function getClassAnnotation(ReflectionClass $refClazz, string $annoClass): ?object
     {
-        try {
-            $attrs = $refClazz->getAttributes();
-        } catch (Throwable) {
-            $attrs = [];
-        }
-
         $annoClass = StringUtils::ensureLeft($annoClass, "\\");
 
-        /* @var ReflectionAttribute $attr */
-        foreach ($attrs as $attr) {
-            if (StringUtils::ensureLeft($attr->getName(), "\\") !== $annoClass) {
-                continue;
-            }
+        try {
+            $reader = new AnnotationReader();
+            $annotations = $reader->getClassAnnotations($refClazz);
+        } catch (Throwable $ex) {
+            $annotations = [];
+        }
 
-            return self::buildAnno($attr);
+        foreach ($annotations as $anno) {
+            if (StringUtils::ensureLeft(get_class($anno), "\\") === $annoClass) {
+                return $anno;
+            }
         }
 
         return null;
@@ -45,21 +41,19 @@ final class ReflectUtils
 
     public static function getMethodAnnotation(ReflectionMethod $method, string $annoClass): ?object
     {
-        try {
-            $attrs = $method->getAttributes();
-        } catch (Throwable) {
-            $attrs = [];
-        }
-
         $annoClass = StringUtils::ensureLeft($annoClass, "\\");
 
-        /* @var ReflectionAttribute $attr */
-        foreach ($attrs as $attr) {
-            if (StringUtils::ensureLeft($attr->getName(), "\\") !== $annoClass) {
-                continue;
-            }
+        try {
+            $reader = new AnnotationReader();
+            $annotations = $reader->getMethodAnnotations($method);
+        } catch (Throwable $ex) {
+            $annotations = [];
+        }
 
-            return self::buildAnno($attr);
+        foreach ($annotations as $anno) {
+            if (StringUtils::ensureLeft(get_class($anno), "\\") === $annoClass) {
+                return $anno;
+            }
         }
 
         return null;
@@ -68,18 +62,16 @@ final class ReflectUtils
     /**
      * @param ReflectionProperty $property
      * @param ReflectionMethod[] $methods
-     * @param bool $strictMode
      * @return ReflectionMethod|null
      */
-    public static function getGetter(ReflectionProperty $property, array $methods = [], bool $strictMode = false): ?ReflectionMethod
+    public static function getGetter(ReflectionProperty $property, array $methods = []): ?ReflectionMethod
     {
-        $fieldType = $property->getType();
         $fieldName = strtolower($property->getName());
 
         if (empty($methods)) {
             try {
                 $methods = $property->getDeclaringClass()->getMethods(ReflectionMethod::IS_PUBLIC);
-            } catch (Throwable) {
+            } catch (Throwable $ex) {
                 $methods = [];
             }
         }
@@ -91,16 +83,6 @@ final class ReflectUtils
         $getter = null;
 
         foreach ($methods as $method) {
-            $returnType = $method->getReturnType();
-
-            if ($strictMode) {
-                if (!($fieldType instanceof ReflectionNamedType) ||
-                    !($returnType instanceof ReflectionNamedType) ||
-                    $returnType->getName() !== $fieldType->getName()) {
-                    continue;
-                }
-            }
-
             if (strtolower($method->getName()) === "get$fieldName") {
                 $getter = $method;
                 break;
@@ -121,18 +103,16 @@ final class ReflectUtils
     /**
      * @param ReflectionProperty $property
      * @param ReflectionMethod[] $methods
-     * @param bool $strictMode
      * @return ReflectionMethod|null
      */
-    public static function getSetter(ReflectionProperty $property, array $methods = [], bool $strictMode = false): ?ReflectionMethod
+    public static function getSetter(ReflectionProperty $property, array $methods = []): ?ReflectionMethod
     {
-        $fieldType = $property->getType();
         $fieldName = strtolower($property->getName());
 
         if (empty($methods)) {
             try {
                 $methods = $property->getDeclaringClass()->getMethods(ReflectionMethod::IS_PUBLIC);
-            } catch (Throwable) {
+            } catch (Throwable $ex) {
                 $methods = [];
             }
         }
@@ -146,22 +126,12 @@ final class ReflectUtils
         foreach ($methods as $method) {
             try {
                 $args = $method->getParameters();
-            } catch (Throwable) {
+            } catch (Throwable $ex) {
                 $args = [];
             }
 
             if (count($args) !== 1) {
                 continue;
-            }
-
-            $argType = $args[0]->getType();
-
-            if ($strictMode) {
-                if (!($fieldType instanceof ReflectionNamedType) ||
-                    !($argType instanceof ReflectionNamedType) ||
-                    $argType->getName() !== $fieldType->getName()) {
-                    continue;
-                }
             }
 
             if (strtolower($method->getName()) === "set$fieldName") {
@@ -175,43 +145,19 @@ final class ReflectUtils
 
     public static function getPropertyAnnotation(ReflectionProperty $property, string $annoClass): ?object
     {
-        try {
-            $attrs = $property->getAttributes();
-        } catch (Throwable) {
-            $attrs = [];
-        }
-
         $annoClass = StringUtils::ensureLeft($annoClass, "\\");
 
-        /* @var ReflectionAttribute $attr */
-        foreach ($attrs as $attr) {
-            if (StringUtils::ensureLeft($attr->getName(), "\\") !== $annoClass) {
-                continue;
-            }
-
-            return self::buildAnno($attr);
-        }
-
-        return null;
-    }
-
-    public static function getParameterAnnotation(ReflectionParameter $param, string $annoClass): ?object
-    {
         try {
-            $attrs = $param->getAttributes();
-        } catch (Throwable) {
-            $attrs = [];
+            $reader = new AnnotationReader();
+            $annotations = $reader->getPropertyAnnotations($property);
+        } catch (Throwable $ex) {
+            $annotations = [];
         }
 
-        $annoClass = StringUtils::ensureLeft($annoClass, "\\");
-
-        /* @var ReflectionAttribute $attr */
-        foreach ($attrs as $attr) {
-            if (StringUtils::ensureLeft($attr->getName(), "\\") !== $annoClass) {
-                continue;
+        foreach ($annotations as $anno) {
+            if (StringUtils::ensureLeft(get_class($anno), "\\") === $annoClass) {
+                return $anno;
             }
-
-            return self::buildAnno($attr);
         }
 
         return null;
@@ -220,23 +166,23 @@ final class ReflectUtils
     public static function getMapKeyByProperty(ReflectionProperty $property, array $propertyNameToMapKey = []): string
     {
         try {
-            $attrs = $property->getAttributes();
-        } catch (Throwable) {
-            $attrs = [];
+            $reader = new AnnotationReader();
+            $annotations = $reader->getPropertyAnnotations($property);
+        } catch (Throwable $ex) {
+            $annotations = [];
         }
 
-        $anno = null;
+        $annoMapKey = null;
 
-        /* @var ReflectionAttribute */
-        foreach ($attrs as $attr) {
-            if (str_ends_with($attr->getName(), 'MapKey')) {
-                $anno = $attr;
+        foreach ($annotations as $anno) {
+            if (preg_match('/MapKey$/', get_class($anno))) {
+                $annoMapKey = $anno;
                 break;
             }
         }
 
-        if (is_object($anno) && method_exists($anno, 'getValue')) {
-            $mapKey = Cast::toString($anno->getValue());
+        if (is_object($annoMapKey) && method_exists($annoMapKey, 'getValue')) {
+            $mapKey = Cast::toString($annoMapKey->getValue());
 
             if ($mapKey !== '') {
                 return $mapKey;
@@ -253,7 +199,13 @@ final class ReflectUtils
         return $mapKey === '' ? $fieldName : $mapKey;
     }
 
-    public static function getMapValueByProperty(array $map1, ReflectionProperty $property, array $propertyNameToMapKey = []): mixed
+    /**
+     * @param array $map1
+     * @param ReflectionProperty $property
+     * @param array $propertyNameToMapKey
+     * @return mixed
+     */
+    public static function getMapValueByProperty(array $map1, ReflectionProperty $property, array $propertyNameToMapKey = [])
     {
         if (empty($map1)) {
             return null;
@@ -283,17 +235,5 @@ final class ReflectUtils
         }
 
         return null;
-    }
-
-    private static function buildAnno(ReflectionAttribute $attr): ?object
-    {
-        try {
-            $className = StringUtils::ensureLeft($attr->getName(), "\\");
-            $anno = (new ReflectionClass($className))->newInstance(...$attr->getArguments());
-        } catch (Throwable) {
-            $anno = null;
-        }
-
-        return is_object($anno) ? $anno : null;
     }
 }

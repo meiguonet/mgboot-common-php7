@@ -1,6 +1,6 @@
 <?php
 
-namespace mgboot\trait;
+namespace mgboot\traits;
 
 use mgboot\util\ReflectUtils;
 use mgboot\util\StringUtils;
@@ -21,10 +21,10 @@ trait MapAbleTrait
             $propertyName = $key;
             $needUcwords = false;
 
-            if (str_contains($propertyName, '-')) {
+            if (strpos($propertyName, '-') !== false) {
                 $propertyName = str_replace('-', ' ', $propertyName);
                 $needUcwords = true;
-            } else if (str_contains($propertyName, '_')) {
+            } else if (strpos($propertyName, '_') !== false) {
                 $propertyName = str_replace('_', ' ', $propertyName);
                 $needUcwords = true;
             }
@@ -38,10 +38,10 @@ trait MapAbleTrait
             $isNewValue = false;
 
             if (is_string($value)) {
-                if (str_starts_with($value, '@Duration:')) {
+                if (StringUtils::startsWith($value, '@Duration:')) {
                     $value = StringUtils::toDuration(str_replace('@Duration:', '', $value));
                     $isNewValue = true;
-                } else if (str_starts_with($value, '@DataSize:')) {
+                } else if (StringUtils::startsWith($value, '@DataSize:')) {
                     $value = StringUtils::toDataSize(str_replace('@DataSize:', '', $value));
                     $isNewValue = true;
                 }
@@ -62,7 +62,7 @@ trait MapAbleTrait
 
             try {
                 $this->$propertyName = $value;
-            } catch (Throwable) {
+            } catch (Throwable $ex) {
             }
         }
     }
@@ -71,7 +71,7 @@ trait MapAbleTrait
     {
         try {
             $clazz = new ReflectionClass(StringUtils::ensureLeft(get_class($this), "\\"));
-        } catch (Throwable) {
+        } catch (Throwable $ex) {
             $clazz = null;
         }
 
@@ -90,7 +90,7 @@ trait MapAbleTrait
 
             try {
                 $value = $this->$propertyName;
-            } catch (Throwable) {
+            } catch (Throwable $ex) {
                 continue;
             }
 
@@ -115,7 +115,13 @@ trait MapAbleTrait
         return ReflectUtils::getMapKeyByProperty($property, $propertyNameToMapKey);
     }
 
-    private function getMapValueByProperty(array $map1, ReflectionProperty $property, array $propertyNameToMapKey = []): mixed
+    /**
+     * @param array $map1
+     * @param ReflectionProperty $property
+     * @param array $propertyNameToMapKey
+     * @return mixed
+     */
+    private function getMapValueByProperty(array $map1, ReflectionProperty $property, array $propertyNameToMapKey = [])
     {
         return ReflectUtils::getMapValueByProperty($map1, $property, $propertyNameToMapKey);
     }

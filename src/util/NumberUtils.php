@@ -12,14 +12,22 @@ final class NumberUtils
     {
     }
 
-    public static function isZero(string|int|float $arg0): bool
+    /**
+     * @param float|int|string $arg0
+     * @return bool
+     */
+    public static function isZero($arg0): bool
     {
         return bcadd($arg0, 0, 2) === '0.00';
     }
 
-    public static function isNegative(string|int|float $arg0): bool
+    /**
+     * @param float|int|string $arg0
+     * @return bool
+     */
+    public static function isNegative($arg0): bool
     {
-        return str_starts_with(bcadd($arg0, 0, 2), '-');
+        return strpos(bcadd($arg0, 0, 2), '-') === 0;
     }
 
     /**
@@ -52,8 +60,15 @@ final class NumberUtils
         return $m;
     }
 
+    /**
+     * @param mixed $num
+     * @param int $fractionDigitsNum
+     * @param bool $thousandSep
+     * @param bool $stripTailsZero
+     * @return string
+     */
     public static function toDecimalString(
-        mixed $num,
+        $num,
         int $fractionDigitsNum = 2,
         bool $thousandSep = false,
         bool $stripTailsZero = true
@@ -94,9 +109,13 @@ final class NumberUtils
         return $p2 === '' ? $p1 : "$p1.$p2";
     }
 
-    public static function thousandSep(mixed $num): string
+    /**
+     * @param mixed $num
+     * @return string
+     */
+    public static function thousandSep($num): string
     {
-        $num = (int)$num;
+        $num = (int) $num;
         $chars = collect(StringUtils::toMbCharArray("$num"))->reverse()->toArray();
         $parts = [];
 
@@ -107,7 +126,13 @@ final class NumberUtils
         return implode('', array_reverse($parts));
     }
 
-    public static function toFriendlyString(mixed $num, int $n1 = 2, array $units = ['K', 'W']): string
+    /**
+     * @param mixed $num
+     * @param int $n1
+     * @param array|string[] $units
+     * @return string
+     */
+    public static function toFriendlyString($num, int $n1 = 2, array $units = ['K', 'W']): string
     {
         $num = bcadd($num, 0, 2);
 
@@ -132,7 +157,12 @@ final class NumberUtils
         return self::toDecimalString($num, $n1) . $units[1];
     }
 
-    public static function toFriendlyDistanceString(mixed $distance, array $units = ['m', 'km']): string
+    /**
+     * @param mixed $distance
+     * @param string[] $units
+     * @return string
+     */
+    public static function toFriendlyDistanceString($distance, array $units = ['m', 'km']): string
     {
         $distance = bcadd($distance, 0, 2);
 

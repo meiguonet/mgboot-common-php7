@@ -12,7 +12,7 @@ final class RequestParamSecurityMode
     {
     }
 
-    private function __clone(): void
+    private function __clone()
     {
     }
 }

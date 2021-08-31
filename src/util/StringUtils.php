@@ -15,11 +15,17 @@ final class StringUtils
     {
     }
 
-    private function __clone(): void
+    private function __clone()
     {
     }
 
-    public static function equals(mixed $arg0, mixed $arg1, bool $ignoreCase = false): bool
+    /**
+     * @param mixed $arg0
+     * @param mixed $arg1
+     * @param bool $ignoreCase
+     * @return bool
+     */
+    public static function equals($arg0, $arg1, bool $ignoreCase = false): bool
     {
         if (!is_string($arg0) || !is_string($arg1)) {
             return false;
@@ -56,10 +62,6 @@ final class StringUtils
         $idx = $last ? mb_strrpos($str, $delimiter, 0, 'utf-8') : mb_strpos($str, $delimiter, 0, 'utf-8');
 
         if ($idx === false || $idx === 0) {
-            return '';
-        }
-
-        if ($idx === 0) {
             return '';
         }
 
@@ -112,11 +114,17 @@ final class StringUtils
             $type = RandomStringType::DEFAULT;
         }
 
-        $seeds = match ($type) {
-            RandomStringType::ALPHA => 'ABCDEFGHJKLMNPQRSTUVWXYYXWVUTSRQPNMLKJHGFEDCBA',
-            RandomStringType::ALNUM => '0123456789',
-            default => 'ABCDEFGHJKLMNPQRSTUVWXY34567899876543YXWVUTSRQPNMLKJHGFEDCBA'
-        };
+        switch ($type) {
+            case RandomStringType::ALPHA:
+                $seeds = 'ABCDEFGHJKLMNPQRSTUVWXYYXWVUTSRQPNMLKJHGFEDCBA';
+                break;
+            case RandomStringType::ALNUM:
+                $seeds = '0123456789';
+                break;
+            default:
+                $seeds = 'ABCDEFGHJKLMNPQRSTUVWXY34567899876543YXWVUTSRQPNMLKJHGFEDCBA';
+                break;
+        }
 
         $n1 = strlen($seeds) - 1;
         $sb = [];
@@ -128,7 +136,8 @@ final class StringUtils
         return implode('', $sb);
     }
 
-    public static function toDateTime(string $str, ?DateTimeZone $tz = null): ?DateTime {
+    public static function toDateTime(string $str, ?DateTimeZone $tz = null): ?DateTime
+    {
         $s1 = str_replace('-', ' ', trim($str));
         $s1 = str_replace('/', ' ', $s1);
         $s1 = str_replace(':', ' ', $s1);
@@ -212,7 +221,7 @@ final class StringUtils
             }
 
             return DateTime::createFromFormat('Y-m-d H:i:s', $timeStr, $tz);
-        } catch (Throwable) {
+        } catch (Throwable $ex) {
             return null;
         }
     }
@@ -409,8 +418,8 @@ final class StringUtils
             return false;
         }
 
-        $flag1 = str_starts_with($str, '{') && str_ends_with($str, '}');
-        $flag2 = str_starts_with($str, '[') && str_ends_with($str, ']');
+        $flag1 = self::startsWith($str, '{') && self::endsWith($str, '}');
+        $flag2 = self::startsWith($str, '[') && self::endsWith($str, ']');
 
         if (!$flag1 && !$flag2) {
             return false;
@@ -433,7 +442,7 @@ final class StringUtils
     public static function isDate(string $str): bool
     {
         $d1 = self::toDateTime($str);
-        return $d1 instanceof DateTime && str_ends_with($d1->format('Y-m-d H:i:s'), '00:00:00');
+        return $d1 instanceof DateTime && self::endsWith($d1->format('Y-m-d H:i:s'), '00:00:00');
     }
 
     public static function toDuration(string $str): int
@@ -530,11 +539,7 @@ final class StringUtils
             return [];
         }
 
-        if (version_compare(PHP_VERSION, '8.0.0') === -1) {
-            /** @noinspection PhpDeprecationInspection */
-            libxml_disable_entity_loader(true);
-        }
-
+        libxml_disable_entity_loader(true);
         $element = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
         return $element instanceof SimpleXMLElement ? get_object_vars($element) : [];
     }
@@ -617,7 +622,7 @@ final class StringUtils
 
         if ($n1 <= 4) {
             $p1 = self::maskString($p1, 1, 1);
-        } else if ($n1 > 4 && $n1 <= 6) {
+        } else if ($n1 <= 6) {
             $p1 = self::maskString($p1, 2, 2);
         } else {
             $p1 = self::maskString($p1, 3, 3);
@@ -680,7 +685,11 @@ final class StringUtils
         return mb_substr($str, 0, $len - $n, $encoding) . $suffix;
     }
 
-    public static function removeSqlSpecialChars(string|array $var): string|array
+    /**
+     * @param string|array $var
+     * @return string|array
+     */
+    public static function removeSqlSpecialChars($var)
     {
         if (is_array($var)) {
             foreach ($var as $key => $item) {
@@ -706,7 +715,11 @@ final class StringUtils
         if (empty($delimiters) || !ArrayUtils::isStringArray($delimiters)) {
             $delimiters = [' ', '-', '_'];
         } else {
-            $delimiters = array_values(array_filter($delimiters, fn($it) => strlen($it) === 1));
+            $delimiters = array_filter($delimiters, function ($ch) {
+                return strlen($ch) === 1;
+            });
+
+            $delimiters = empty($delimiters) ? [] : array_values($delimiters);
         }
 
         if (empty($delimiters)) {
@@ -722,7 +735,11 @@ final class StringUtils
         }
 
         $str = preg_replace(Regexp::SPACE_SEP, ' ', $str);
-        $parts = array_map(fn($it) => ucfirst($it), explode(' ', $str));
+
+        $parts = array_map(function ($s1) {
+            return ucfirst($s1);
+        }, explode(' ', $str));
+
         return implode($joinBy, $parts);
     }
 
@@ -731,7 +748,11 @@ final class StringUtils
         if (empty($delimiters) || !ArrayUtils::isStringArray($delimiters)) {
             $delimiters = [' ', '-', '_'];
         } else {
-            $delimiters = array_values(array_filter($delimiters, fn($it) => strlen($it) === 1));
+            $delimiters = array_filter($delimiters, function ($ch) {
+                return strlen($ch) === 1;
+            });
+
+            $delimiters = empty($delimiters) ? [] : array_values($delimiters);
         }
 
         if (empty($delimiters)) {
@@ -747,7 +768,11 @@ final class StringUtils
         }
 
         $str = preg_replace(Regexp::SPACE_SEP, ' ', $str);
-        $parts = array_map(fn($it) => lcfirst($it), explode(' ', $str));
+
+        $parts = array_map(function ($s1) {
+            return lcfirst($s1);
+        }, explode(' ', $str));
+
         return implode($joinBy, $parts);
     }
 
@@ -862,12 +887,21 @@ final class StringUtils
         $posRange = range(0, count($chars) - 1);
 
         if ($end < $start) {
-            $nums = array_values(array_filter($posRange, fn($it) => $it >= $start));
+            $nums = array_filter($posRange, function ($n) use ($start) {
+                return $n >= $start;
+            });
         } else {
-            $nums = array_values(array_filter($posRange, fn($it) => $it >= $start && $it < $end));
+            $nums = array_filter($posRange, function ($n) use ($start, $end) {
+                return $n >= $start && $n < $end;
+            });
         }
 
-        $parts = array_map(fn($it) => $chars[$it], $nums);
+        $nums = empty($nums) ? [] : array_values($nums);
+
+        $parts = array_map(function ($n) use ($chars) {
+            return $chars[$n];
+        }, $nums);
+
         return implode('', $parts);
     }
 

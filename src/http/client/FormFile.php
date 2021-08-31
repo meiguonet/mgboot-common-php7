@@ -2,17 +2,32 @@
 
 namespace mgboot\http\client;
 
-use mgboot\trait\MapAbleTrait;
+use mgboot\traits\MapAbleTrait;
 use mgboot\util\FileUtils;
 
 final class FormFile
 {
     use MapAbleTrait;
 
-    private string $formFieldName = '';
-    private string $filename = '';
-    private string $mimeType = '';
-    private string $tempFilepath = '';
+    /**
+     * @var string
+     */
+    private $formFieldName = '';
+
+    /**
+     * @var string
+     */
+    private $filename = '';
+
+    /**
+     * @var string
+     */
+    private $mimeType = '';
+
+    /**
+     * @var string
+     */
+    private $tempFilepath = '';
 
     private function __construct(?array $data = null)
     {
@@ -27,7 +42,7 @@ final class FormFile
     {
     }
 
-    public static function fromFile(string $formFieldName, string $filepath): self
+    public static function fromFile(string $formFieldName, string $filepath): FormFile
     {
         $filepath = FileUtils::getRealpath($filepath);
         $filename = basename($filepath);

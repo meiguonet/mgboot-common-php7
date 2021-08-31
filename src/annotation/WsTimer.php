@@ -2,16 +2,32 @@
 
 namespace mgboot\annotation;
 
-use Attribute;
+use Doctrine\Common\Annotations\Annotation\Target;
 
-#[Attribute(Attribute::TARGET_CLASS)]
+/**
+ * @Annotation
+ * @Target("CLASS")
+ */
 final class WsTimer
 {
-    private string $value;
+    /**
+     * @var string
+     */
+    private $value;
 
-    public function __construct(string $value)
+    public function __construct($arg0)
     {
-        $this->value = $value;
+        if (is_string($arg0) && $arg0 !== '') {
+            $this->value = $arg0;
+            return;
+        }
+
+        if (is_array($arg0) && is_string($arg0['value'])) {
+            $this->value = $arg0['value'];
+            return;
+        }
+
+        $this->value = '';
     }
 
     public function getValue(): string

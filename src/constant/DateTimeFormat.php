@@ -12,7 +12,7 @@ final class DateTimeFormat
     {
     }
 
-    private function __clone(): void
+    private function __clone()
     {
     }
 }

@@ -11,7 +11,7 @@ final class HttpClientResponseType
     {
     }
 
-    private function __clone(): void
+    private function __clone()
     {
     }
 }

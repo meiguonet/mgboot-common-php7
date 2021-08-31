@@ -3,7 +3,7 @@
 namespace mgboot\util;
 
 use DateTime;
-use Lcobucci\JWT\Encoding\JoseEncoder;
+use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Signer\Key;
 use Lcobucci\JWT\Token;
 use mgboot\Cast;
@@ -42,33 +42,67 @@ final class JwtUtils
         return [true, 0];
     }
 
-    public static function intClaim(Token|string $arg0, string $name, int $default = PHP_INT_MIN): int
+    /**
+     * @param Token|string $arg0
+     * @param string $name
+     * @param int $default
+     * @return int
+     */
+    public static function intClaim($arg0, string $name, int $default = PHP_INT_MIN): int
     {
         return Cast::toInt(self::claim($arg0, $name), $default);
     }
 
-    public static function floatClaim(Token|string $arg0, string $name, float $default = PHP_FLOAT_MIN): float
+    /**
+     * @param Token|string $arg0
+     * @param string $name
+     * @param float $default
+     * @return float
+     */
+    public static function floatClaim($arg0, string $name, float $default = PHP_FLOAT_MIN): float
     {
         return Cast::toFloat(self::claim($arg0, $name), $default);
     }
 
-    public static function booleanClaim(Token|string $arg0, string $name, bool $default = false): bool
+    /**
+     * @param Token|string $arg0
+     * @param string $name
+     * @param bool $default
+     * @return bool
+     */
+    public static function booleanClaim($arg0, string $name, bool $default = false): bool
     {
         return Cast::toBoolean(self::claim($arg0, $name), $default);
     }
 
-    public static function stringClaim(Token|string $arg0, string $name, string $default = ''): string
+    /**
+     * @param Token|string $arg0
+     * @param string $name
+     * @param string $default
+     * @return string
+     */
+    public static function stringClaim($arg0, string $name, string $default = ''): string
     {
         return Cast::toString(self::claim($arg0, $name), $default);
     }
 
-    public static function arrayClaim(Token|string $arg0, string $name): array
+    /**
+     * @param Token|string $arg0
+     * @param string $name
+     * @return array
+     */
+    public static function arrayClaim($arg0, string $name): array
     {
         $ret = self::claim($arg0, $name);
         return is_array($ret) ? $ret : [];
     }
 
-    private static function claim(Token|string $arg0, string $name): mixed
+    /**
+     * @param Token|string $arg0
+     * @param string $name
+     * @return mixed
+     */
+    private static function claim($arg0, string $name)
     {
         $jwt = null;
 
@@ -76,8 +110,8 @@ final class JwtUtils
             $jwt = $arg0;
         } else if (is_string($arg0) && $arg0 !== '') {
             try {
-                $jwt = (new Token\Parser(new JoseEncoder()))->parse($arg0);
-            } catch (Throwable) {
+                $jwt = (new Parser())->parse($arg0);
+            } catch (Throwable $ex) {
                 $jwt = null;
             }
         }
@@ -88,7 +122,7 @@ final class JwtUtils
 
         try {
             return $jwt->claims()->get($name);
-        } catch (Throwable) {
+        } catch (Throwable $ex) {
             return null;
         }
     }
