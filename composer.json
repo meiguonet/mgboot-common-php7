@@ -1,0 +1,28 @@
+{
+  "name": "meiguonet/mgboot-common-php7",
+  "description": "common library for meiguonet mgboot framework",
+  "keywords": [],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Simon.Ye",
+      "email": "samlinye@163.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "mgboot\\": "src/"
+    }
+  },
+  "require": {
+    "php": ">=7.3.0",
+    "psr/log": "^1.1.4",
+    "symfony/yaml": "^5.3.6",
+    "dflydev/apache-mime-types": "^1.0.1",
+    "ezyang/htmlpurifier": "^4.13.0",
+    "lcobucci/jwt": "^3.4.5",
+    "guzzlehttp/guzzle": "^7.3.0",
+    "illuminate/support": "^8.57.0",
+    "nesbot/carbon": "^2.52.0"
+  }
+}
