@@ -6,11 +6,30 @@ use mgboot\Cast;
 
 final class UploadedFile
 {
-    private string $formFieldName;
-    private string $clientFilename;
-    private string $clientMediaType;
-    private string $tempFilePath = '';
-    private int $error;
+    /**
+     * @var string
+     */
+    private $formFieldName;
+
+    /**
+     * @var string
+     */
+    private $clientFilename;
+
+    /**
+     * @var string
+     */
+    private $clientMediaType;
+
+    /**
+     * @var string
+     */
+    private $tempFilePath = '';
+
+    /**
+     * @var int
+     */
+    private $error;
 
     private function __construct(string $formFieldName, ?array $meta)
     {
@@ -31,7 +50,7 @@ final class UploadedFile
         $this->tempFilePath = $filepath;
     }
 
-    private function __clone(): void
+    private function __clone()
     {
     }
 

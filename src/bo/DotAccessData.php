@@ -48,7 +48,7 @@ final class DotAccessData
      */
     public function get(string $key)
     {
-        if (!str_contains($key, '.')) {
+        if (strpos($key, '.') === false) {
             return $this->getValueInternal($key);
         }
 

@@ -302,7 +302,7 @@ final class StringUtils
             return false;
         }
 
-        if (!str_contains($str, '@')) {
+        if (strpos($str, '@') === false) {
             return false;
         }
 
@@ -311,9 +311,9 @@ final class StringUtils
         if (count($parts) !== 2 ||
             empty($parts[0]) ||
             empty($parts[1]) ||
-            !str_contains($parts[1], '.') ||
-            str_starts_with($parts[1], '.') ||
-            str_ends_with($parts[1], '.')) {
+            strpos($parts[1], '.') === false ||
+            StringUtils::startsWith($parts[1], '.') ||
+            StringUtils::endsWith($parts[1], '.')) {
             return false;
         }
 

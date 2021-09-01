@@ -488,7 +488,7 @@ final class HttpClient
 
         $host = $this->getHostByRequestUrl();
         $port = $this->getPortByRequestUrl();
-        $isHttps = str_starts_with($this->requestUrl, 'https://');
+        $isHttps = StringUtils::startsWith($this->requestUrl, 'https://');
         return new \Swoole\Coroutine\Http\Client($host, $port, $isHttps);
     }
 
@@ -503,7 +503,7 @@ final class HttpClient
             $options['cookies'] = new CookieJar(false, [SetCookie::fromString(implode('; ', $this->cookies))]);
         }
 
-        if (str_starts_with($this->requestUrl, 'https://')) {
+        if (StringUtils::startsWith($this->requestUrl, 'https://')) {
             $options['verify'] = $this->verify ? __DIR__ . '/cacert.pem' : false;
             $sslCertPem = $this->sslCertPem;
             $sslKeyPem = $this->sslKeyPem;
@@ -616,7 +616,7 @@ final class HttpClient
             'read_timeout' => Cast::toFloat($this->readTimeout)
         ];
 
-        if (str_starts_with($this->requestUrl, 'https://')) {
+        if (StringUtils::startsWith($this->requestUrl, 'https://')) {
             $options['ssl_verify_peer'] = $this->verify;
 
             if ($this->verify) {
@@ -733,7 +733,7 @@ final class HttpClient
             return $map1['port'];
         }
 
-        return str_starts_with($this->requestUrl, 'https://') ? 443 : 80;
+        return StringUtils::startsWith($this->requestUrl, 'https://') ? 443 : 80;
     }
 
     private function getPathByRequestUrl(): string
